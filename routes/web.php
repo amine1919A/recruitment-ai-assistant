@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\JobMatchController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -8,7 +8,10 @@ use App\Http\Controllers\CVController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminController;
-
+Route::middleware('auth')->group(function () {
+    Route::get('/match', [JobMatchController::class, 'index']);
+    Route::post('/match', [JobMatchController::class, 'match']);
+});
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),

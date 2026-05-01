@@ -55,6 +55,35 @@ class AIService
 
             return $response['choices'][0]['message']['content'];
         }
+    public function matchJob($cvText, $jobDesc)
+        {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
+            ])->post('https://api.openai.com/v1/chat/completions', [
+                'model' => 'gpt-4o-mini',
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => "
+        Compare ce CV avec cette offre d'emploi :
+
+        CV:
+        $cvText
+
+        JOB:
+        $jobDesc
+
+        Donne:
+        - Score /100
+        - Compatibilité
+        - Recommandations
+        "
+                    ]
+                ]
+            ]);
+
+            return $response['choices'][0]['message']['content'];
+        }
     public function analyzeCV(string $text)
     {
         $response = Http::withHeaders([
