@@ -13,10 +13,11 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
-Route::middleware(['auth'])->group(function () {
-    Route::get('/cv', [CVController::class, 'index'])->name('cv.index');
-    Route::post('/cv/upload', [CVController::class, 'upload'])->name('cv.upload');
+Route::middleware('auth')->group(function () {
+    Route::get('/cv', [CVController::class, 'index']);
+    Route::post('/cv/upload', [CVController::class, 'upload']);
 });
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
