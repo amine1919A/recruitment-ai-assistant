@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CVController;
 use App\Http\Controllers\InterviewController;
+use App\Http\Controllers\DashboardController;
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -14,6 +15,11 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+});
+
+
 Route::middleware('auth')->group(function () {
     Route::get('/cv', [CVController::class, 'index']);
     Route::post('/cv/upload', [CVController::class, 'upload']);
