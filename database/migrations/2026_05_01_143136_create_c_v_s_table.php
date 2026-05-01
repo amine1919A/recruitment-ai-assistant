@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('file_path');
-            $table->text('analysis')->nullable();
+            $table->longText('analysis')->nullable();
             $table->timestamps();
         });
     }

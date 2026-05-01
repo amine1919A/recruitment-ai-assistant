@@ -1,15 +1,17 @@
 <x-app-layout>
-    <div class="max-w-3xl mx-auto mt-10 bg-white p-6 rounded shadow">
+    <div class="max-w-4xl mx-auto mt-10 bg-white p-6 rounded shadow">
 
-        <h2 class="text-xl font-bold mb-4">Résultat Analyse CV 🤖</h2>
+        <h2 class="text-2xl font-bold mb-4">Résultat Analyse IA 🤖</h2>
 
-        <div class="bg-gray-100 p-4 rounded">
-            {!! nl2br(e($analysis)) !!}
+        <div class="bg-gray-100 p-4 rounded whitespace-pre-line">
+            {{ $analysis }}
         </div>
 
-        <a href="/cv" class="text-blue-500 mt-4 inline-block">
-            ← Retour
-        </a>
+        <div class="mt-6">
+            <a href="/cv" class="text-blue-600">
+                ← Retour Upload
+            </a>
+        </div>
 
     </div>
 </x-app-layout>

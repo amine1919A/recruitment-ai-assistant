@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Storage;
 
 use Illuminate\Http\Request;
 use App\Models\CV;
 use App\Services\AIService;
+
 class CVController extends Controller
 {
     public function index()
@@ -14,25 +14,23 @@ class CVController extends Controller
     }
 
     public function upload(Request $request, AIService $ai)
-{
-    $request->validate([
-        'cv' => 'required|mimes:pdf,doc,docx|max:2048'
-    ]);
+    {
+        $request->validate([
+            'cv' => 'required|mimes:pdf,doc,docx|max:2048'
+        ]);
 
-    $path = $request->file('cv')->store('cvs');
+        $path = $request->file('cv')->store('cvs');
 
-    // ⚠️ extraction simple (version débutant)
-    $text = file_get_contents(storage_path("app/".$path));
+        $text = file_get_contents(storage_path("app/".$path));
 
-    // 🤖 appel IA
-    $analysis = $ai->analyzeCV($text);
+        $analysis = $ai->analyzeCV($text);
 
-    $cv = CV::create([
-        'user_id' => auth()->id(),
-        'file_path' => $path,
-        'analysis' => $analysis
-    ]);
+        $cv = CV::create([
+            'user_id' => auth()->id(),
+            'file_path' => $path,
+            'analysis' => $analysis
+        ]);
 
-    return view('cv.result', compact('cv', 'analysis'));
-}
+        return view('cv.result', compact('cv', 'analysis'));
+    }
 }

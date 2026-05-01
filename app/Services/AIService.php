@@ -15,23 +15,23 @@ class AIService
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'Tu es un expert RH senior qui analyse des CV.'
+                    'content' => 'Tu es un recruteur expert.'
                 ],
                 [
                     'role' => 'user',
                     'content' => "
-Analyse ce CV et retourne STRICTEMENT :
+Analyse ce CV et donne :
 
-1. Score sur 100  
-2. Points forts  
-3. Points faibles  
-4. Recommandation métier  
+- Score /100  
+- Points forts  
+- Points faibles  
+- Recommandation métier  
 
 CV:
 ".$text
                 ]
             ],
-            'temperature' => 0.4
+            'temperature' => 0.3
         ]);
 
         return $response['choices'][0]['message']['content'];
