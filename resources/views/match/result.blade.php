@@ -1,11 +1,50 @@
 <x-app-layout>
-<div class="max-w-3xl mx-auto mt-10 bg-white p-6 rounded shadow">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-    <h2 class="text-xl font-bold mb-4">Résultat Matching</h2>
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800">🔍 Résultat du Matching</h2>
+                <p class="text-gray-600 mt-1">{{ basename($cv->file_path) }}</p>
+            </div>
+            <a href="{{ route('match.index') }}"
+               class="bg-gray-500 text-white px-5 py-2 rounded-lg hover:bg-gray-600 transition font-semibold">
+                ← Retour
+            </a>
+        </div>
 
-    <div class="bg-gray-100 p-4 whitespace-pre-line">
-        {{ $result }}
+        <div class="bg-white rounded-lg shadow-lg p-8 border mb-6">
+            <div class="prose max-w-none">
+                <div class="bg-gray-50 p-6 rounded-lg border text-gray-800 leading-relaxed whitespace-pre-wrap">
+                    {!! nl2br(e($result)) !!}
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="bg-gray-50 rounded-lg p-6 flex justify-between items-center">
+            <p class="text-gray-700">
+                <strong>Analysé le :</strong> {{ $match->created_at->format('d/m/Y à H:i') }}
+            </p>
+            <div class="flex gap-3">
+                <button onclick="copyToClipboard()" 
+                        class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition font-semibold">
+                    📋 Copier
+                </button>
+                <a href="/cvbuilder/create?cv_id={{ $cv->id }}" 
+                   class="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition font-semibold">
+                    ✨ Optimiser CV
+                </a>
+            </div>
+        </div>
+
     </div>
 
-</div>
+    <script>
+        function copyToClipboard() {
+            const text = document.querySelector('.whitespace-pre-wrap').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Résultat copié dans le presse-papier !');
+            });
+        }
+    </script>
 </x-app-layout>

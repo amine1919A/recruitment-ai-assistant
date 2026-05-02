@@ -1,55 +1,53 @@
 <?php
-use App\Http\Controllers\JobMatchController;
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
+
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CVController;
 use App\Http\Controllers\InterviewController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminController;
-Route::middleware('auth')->group(function () {
-    Route::get('/match', [JobMatchController::class, 'index']);
-    Route::post('/match', [JobMatchController::class, 'match']);
-});
+use App\Http\Controllers\JobMatchController;
+use App\Http\Controllers\CVBuilderController;
+use App\Http\Controllers\ProfileController;
+
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index']);
-});
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/admin', [AdminController::class, 'index']);
-});
-Route::middleware('auth')->group(function () {
-    Route::get('/cv', [CVController::class, 'index']);
-    Route::post('/cv/upload', [CVController::class, 'upload']);
-});
-
-Route::middleware('auth')->group(function () {
-
-    Route::get('/interview', [InterviewController::class, 'index']);
-    Route::get('/interview/start', [InterviewController::class, 'start']);
-    Route::post('/interview/submit', [InterviewController::class, 'submit']);
-
-});
-
-
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    return redirect('/login');
 });
 
 require __DIR__.'/auth.php';
+
+Route::middleware(['auth'])->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/cv', [CVController::class, 'index'])->name('cv.index');
+    Route::post('/cv/upload', [CVController::class, 'upload'])->name('cv.upload');
+    Route::get('/cv/{id}', [CVController::class, 'show'])->name('cv.show'); // ✅ AJOUTER CETTE LIGNE
+    Route::delete('/cv/{id}', [CVController::class, 'destroy'])->name('cv.destroy');
+
+    // Interview Simulation - ✅ CORRIGÉ
+    Route::get('/interview', [InterviewController::class, 'index'])->name('interview.index');
+    Route::get('/interview/start', [InterviewController::class, 'start'])->name('interview.start'); // ✅ GET au lieu de POST
+    Route::post('/interview/submit', [InterviewController::class, 'submit'])->name('interview.submit');
+    Route::delete('/cv/{id}', [CVController::class, 'destroy'])->name('cv.destroy');
+
+    // Job Matching
+    Route::get('/match', [JobMatchController::class, 'index'])->name('match.index');
+    Route::post('/match', [JobMatchController::class, 'match'])->name('match.analyze');
+
+    // CV Builder
+    Route::get('/cvbuilder', [CVBuilderController::class, 'index'])->name('cvbuilder.index');
+    Route::get('/cvbuilder/create', [CVBuilderController::class, 'create'])->name('cvbuilder.create');
+    Route::post('/cvbuilder/generate', [CVBuilderController::class, 'generate'])->name('cvbuilder.generate');
+    Route::get('/cvbuilder/{id}/edit', [CVBuilderController::class, 'edit'])->name('cvbuilder.edit');
+    Route::put('/cvbuilder/{id}', [CVBuilderController::class, 'update'])->name('cvbuilder.update');
+
+    // Admin
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+});
