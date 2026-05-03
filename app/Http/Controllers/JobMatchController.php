@@ -55,4 +55,20 @@ class JobMatchController extends Controller
 
         return view('match.result', compact('result', 'cv', 'match'));
     }
+
+    // ✅ AJOUTER CETTE MÉTHODE
+    public function show($id)
+    {
+        $match = JobMatch::findOrFail($id);
+
+        // Vérifier que le match appartient à l'utilisateur
+        if ($match->user_id !== auth()->id()) {
+            abort(403, 'Accès non autorisé');
+        }
+
+        $cv = $match->cv;
+        $result = $match->match_result;
+
+        return view('match.result', compact('result', 'cv', 'match'));
+    }
 }

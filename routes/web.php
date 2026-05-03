@@ -20,20 +20,21 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // CV Analysis
     Route::get('/cv', [CVController::class, 'index'])->name('cv.index');
     Route::post('/cv/upload', [CVController::class, 'upload'])->name('cv.upload');
-    Route::get('/cv/{id}', [CVController::class, 'show'])->name('cv.show'); // ✅ AJOUTER CETTE LIGNE
+    Route::get('/cv/{id}', [CVController::class, 'show'])->name('cv.show');
     Route::delete('/cv/{id}', [CVController::class, 'destroy'])->name('cv.destroy');
 
-    // Interview Simulation - ✅ CORRIGÉ
+    // Interview Simulation
     Route::get('/interview', [InterviewController::class, 'index'])->name('interview.index');
-    Route::get('/interview/start', [InterviewController::class, 'start'])->name('interview.start'); // ✅ GET au lieu de POST
+    Route::get('/interview/start', [InterviewController::class, 'start'])->name('interview.start');
     Route::post('/interview/submit', [InterviewController::class, 'submit'])->name('interview.submit');
-    Route::delete('/cv/{id}', [CVController::class, 'destroy'])->name('cv.destroy');
 
     // Job Matching
     Route::get('/match', [JobMatchController::class, 'index'])->name('match.index');
     Route::post('/match', [JobMatchController::class, 'match'])->name('match.analyze');
+    Route::get('/match/{id}', [JobMatchController::class, 'show'])->name('match.show'); // ✅ AJOUTER CETTE LIGNE
 
     // CV Builder
     Route::get('/cvbuilder', [CVBuilderController::class, 'index'])->name('cvbuilder.index');
