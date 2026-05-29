@@ -1,0 +1,7 @@
+organization=amine1919a
+projectKey=recruitment-ai-assistant
+serverUrl=https://sonarcloud.io
+serverVersion=8.0.0.88736
+dashboardUrl=https://sonarcloud.io/dashboard?id=recruitment-ai-assistant
+ceTaskId=AZ5xYpI24iLu2B18Ozju
+ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZ5xYpI24iLu2B18Ozju

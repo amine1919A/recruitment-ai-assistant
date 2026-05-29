@@ -1,0 +1,22 @@
+
+"app\mail\cvresultmail::__constructZ
+P/home/amine/Téléchargements/recruitment-ai-assistant/app/Mail/CVResultMail.php ("1*8
+2
+CVResultMail.php"
+ (
+implicit return*v
+1 ("b
+`
+ (!$
+app\mail\cvresultmail"	
+content"__id*(
+
+__unknown_file (
+
+
+$content*
+2:
+  ((
+
+$contentB
+app\mail\cvresultmailH

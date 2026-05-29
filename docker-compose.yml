@@ -1,0 +1,30 @@
+services:
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www
+    command: php artisan serve --host=0.0.0.0 --port=8000
+
+  vite:
+    image: node:20
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    command: npm run dev
+    ports:
+      - "5173:5173"
+
+  mysql:
+    image: mysql:8
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: recAi
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel123
+    ports:
+      - "3307:3306"
