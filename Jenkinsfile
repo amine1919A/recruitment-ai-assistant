@@ -19,10 +19,14 @@ pipeline {
 
         
 
-        stage('Tests (PHPUnit)') {
+        stage('Tests (PHPUnit in Docker)') {
             steps {
                 sh '''
-                docker run --rm $IMAGE:latest php artisan test
+                docker run --rm \
+                -v $WORKSPACE:/var/www \
+                -w /var/www \
+                amineabdelli1/recruitment-ai:latest \
+                php artisan test
                 '''
             }
         }
