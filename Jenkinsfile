@@ -17,16 +17,13 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh 'composer install'
-                sh 'npm install'
-            }
-        }
+        
 
         stage('Tests (PHPUnit)') {
             steps {
-                sh 'php artisan test'
+                sh '''
+                docker run --rm $IMAGE:latest php artisan test
+                '''
             }
         }
 
