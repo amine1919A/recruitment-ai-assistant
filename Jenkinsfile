@@ -29,12 +29,26 @@ pipeline {
                         -e APP_KEY="base64:2fl+Jb4JHbHvaTFgE3BNpjLDfkKIHpBHjqFmJPXhMew=" \
                         -e DB_CONNECTION=sqlite \
                         -e DB_DATABASE=/tmp/test.db \
-                        -e VITE_APP_NAME=Laravel \
                         laravel-test:latest \
                         bash -c "
                             composer install --no-interaction --prefer-dist --quiet &&
-                            mkdir -p public/build &&
-                            echo '{\"resources/js/app.js\":{\"file\":\"assets/app.js\",\"isEntry\":true},\"resources/css/app.css\":{\"file\":\"assets/app.css\",\"isEntry\":true}}' > public/build/manifest.json &&
+                            mkdir -p public/build/assets &&
+                            cat > public/build/manifest.json << 'EOF'
+        {
+            \"resources/js/app.js\": {
+                \"file\": \"assets/app.js\",
+                \"src\": \"resources/js/app.js\",
+                \"isEntry\": true,
+                \"css\": [\"assets/app.css\"]
+            },
+            \"resources/css/app.css\": {
+                \"file\": \"assets/app.css\",
+                \"src\": \"resources/css/app.css\",
+                \"isEntry\": true
+            }
+        }
+        EOF
+                            touch public/build/assets/app.js public/build/assets/app.css &&
                             php artisan test --env=testing 2>&1
                         "
                 '''
