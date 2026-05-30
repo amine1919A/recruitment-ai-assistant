@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        IMAGE = "amineabdelli1/recruitment-ai-assistant"
+        IMAGE = "amineabdelli1/recruitment-ai"
     }
     stages {
         stage('Checkout') {
