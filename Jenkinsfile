@@ -16,7 +16,7 @@ pipeline {
         }
         stage('Build Test Image') {
             steps {
-                sh 'docker build -f Dockerfile.test -t laravel-test:latest . '
+                sh 'docker build -f Dockerfile.test -t laravel-test:latest .'
             }
         }
         stage('Tests (PHPUnit)') {
@@ -30,27 +30,7 @@ pipeline {
                         -e DB_CONNECTION=sqlite \
                         -e DB_DATABASE=/tmp/test.db \
                         laravel-test:latest \
-                        bash -c "
-                            composer install --no-interaction --prefer-dist --quiet &&
-                            mkdir -p public/build/assets &&
-                            cat > public/build/manifest.json << 'EOF'
-        {
-            \"resources/js/app.js\": {
-                \"file\": \"assets/app.js\",
-                \"src\": \"resources/js/app.js\",
-                \"isEntry\": true,
-                \"css\": [\"assets/app.css\"]
-            },
-            \"resources/css/app.css\": {
-                \"file\": \"assets/app.css\",
-                \"src\": \"resources/css/app.css\",
-                \"isEntry\": true
-            }
-        }
-        EOF
-                            touch public/build/assets/app.js public/build/assets/app.css &&
-                            php artisan test --env=testing 2>&1
-                        "
+                        bash -c "composer install --no-interaction --prefer-dist --quiet && mkdir -p public/build/assets && echo '{\"resources/js/app.js\":{\"file\":\"assets/app.js\",\"src\":\"resources/js/app.js\",\"isEntry\":true,\"css\":[\"assets/app.css\"]},\"resources/css/app.css\":{\"file\":\"assets/app.css\",\"src\":\"resources/css/app.css\",\"isEntry\":true}}' > public/build/manifest.json && touch public/build/assets/app.js public/build/assets/app.css && php artisan test --env=testing 2>&1"
                 '''
             }
         }
@@ -96,11 +76,9 @@ pipeline {
             }
         }
     }
-    }
-
     post {
         success {
-            echo "✅ SUCCESS"
+            echo "✅ SUCCESS - App disponible sur http://localhost:30080"
         }
         failure {
             echo "❌ FAILED"
