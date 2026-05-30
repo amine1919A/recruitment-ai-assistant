@@ -22,6 +22,8 @@ spec:
               value: production
             - name: APP_URL
               value: http://localhost:30080
+            - name: DB_CONNECTION
+              value: mysql
             - name: DB_HOST
               value: mysql-service
             - name: DB_DATABASE
