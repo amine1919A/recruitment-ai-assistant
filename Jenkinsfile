@@ -59,7 +59,7 @@ pipeline {
                 withSonarQubeEnv('SonarCloud') {
                     sh '''
                         sonar-scanner \
-                        -Dsonar.projectKey=recruitment-ai-assistant \
+                        -Dsonar.projectKey=amine1919A_recruitment-ai-assistant \
                         -Dsonar.organization=amine1919a \
                         -Dsonar.sources=. \
                         -Dsonar.exclusions=vendor/**,node_modules/**,public/build/** \
