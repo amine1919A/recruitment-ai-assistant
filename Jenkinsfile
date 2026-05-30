@@ -22,7 +22,7 @@ pipeline {
         stage('Tests (PHPUnit)') {
             steps {
                 sh '''
-                    MANIFEST='{"resources/js/app.js":{"file":"assets/app.js","src":"resources/js/app.js","isEntry":true,"css":["assets/app.css"]},"resources/css/app.css":{"file":"assets/app.css","src":"resources/css/app.css","isEntry":true}}'
+                    MANIFEST='{"resources/js/app.jsx":{"file":"assets/app-961NTWgG.js","src":"resources/js/app.jsx","isEntry":true,"css":["assets/app-ElNpJpiu.css"]}}'
                     docker run --rm \
                         -v /var/lib/docker/volumes/jenkins_home/_data/workspace/recruitment-ai-assistant:/var/www \
                         -w /var/www \
@@ -32,7 +32,7 @@ pipeline {
                         -e DB_DATABASE=/tmp/test.db \
                         -e MANIFEST="$MANIFEST" \
                         laravel-test:latest \
-                        bash -c 'composer install --no-interaction --prefer-dist --quiet && mkdir -p public/build/assets && touch public/build/assets/app.js public/build/assets/app.css && echo $MANIFEST > public/build/manifest.json && php artisan test --env=testing 2>&1'
+                        bash -c 'composer install --no-interaction --prefer-dist --quiet && mkdir -p public/build/assets && touch public/build/assets/app-961NTWgG.js public/build/assets/app-ElNpJpiu.css && echo $MANIFEST > public/build/manifest.json && php artisan test --env=testing 2>&1'
                 '''
             }
         }
