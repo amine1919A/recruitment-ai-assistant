@@ -64,7 +64,7 @@ pipeline {
                         -Dsonar.sources=. \
                         -Dsonar.exclusions=vendor/**,node_modules/**,public/build/** \
                         -Dsonar.host.url=https://sonarcloud.io \
-                        -Dsonar.token=${SONAR_TOKEN}
+                        -Dsonar.token=d4d20c870bd3b0aea57f40e1c1be44d3a45e9ee9
                     '''
                 }
             }
