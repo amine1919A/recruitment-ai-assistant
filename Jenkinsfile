@@ -16,7 +16,7 @@ pipeline {
         }
         stage('Build Test Image') {
             steps {
-                sh 'docker build -f Dockerfile.test -t laravel-test:latest .'
+                sh 'docker image inspect laravel-test:latest > /dev/null 2>&1 || docker build -f Dockerfile.test -t laravel-test:latest .'
             }
         }
         stage('Tests (PHPUnit)') {
