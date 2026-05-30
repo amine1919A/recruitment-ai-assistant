@@ -22,7 +22,7 @@ pipeline {
                 sh 'php -v || true'
             }
         }
-        tage('Tests (PHPUnit)') {
+        stage('Tests (PHPUnit)') {
             steps {
                 sh '''
                 docker run --rm \
