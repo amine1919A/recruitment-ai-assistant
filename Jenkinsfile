@@ -62,6 +62,7 @@ pipeline {
                         -Dsonar.projectKey=recruitment-ai-assistant \
                         -Dsonar.organization=amine1919a \
                         -Dsonar.sources=. \
+                        -Dsonar.exclusions=vendor/**,node_modules/**,public/build/** \
                         -Dsonar.host.url=https://sonarcloud.io \
                         -Dsonar.token=${SONAR_TOKEN}
                     '''
