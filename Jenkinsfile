@@ -23,10 +23,13 @@ pipeline {
             steps {
                 sh '''
                 docker run --rm \
-                -v $WORKSPACE:/var/www \
-                -w /var/www \
-                php-ci \
-                bash -c "composer install && php artisan test"
+                -v $WORKSPACE:/app \
+                -w /app \
+                composer:latest \
+                sh -c "
+                composer install &&
+                php artisan test
+                "
                 '''
             }
         }
