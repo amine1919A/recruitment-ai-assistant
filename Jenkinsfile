@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush()
-    }
-
     environment {
         IMAGE = "amineabdelli1/recruitment-ai"
     }
@@ -16,12 +12,13 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Debug Docker') {
+
+        stage('Docker Check') {
             steps {
                 sh 'docker version'
-                sh 'php -v || true'
             }
         }
+
         stage('Tests (PHPUnit)') {
             steps {
                 sh '''
@@ -33,8 +30,6 @@ pipeline {
                 '''
             }
         }
-
-        
 
         stage('SonarCloud Analysis') {
             steps {
@@ -53,9 +48,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                docker build -t $IMAGE:latest .
-                '''
+                sh 'docker build -t $IMAGE:latest .'
             }
         }
 
@@ -70,22 +63,14 @@ pipeline {
             }
         }
 
-        stage('Deploy Kubernetes') {
-            steps {
-                sh '''
-                kubectl apply -f k8s/ || true
-                kubectl rollout restart deployment laravel-app || true
-                '''
-            }
-        }
     }
 
     post {
         success {
-            echo "✅ Pipeline completed successfully"
+            echo "✅ SUCCESS"
         }
         failure {
-            echo "❌ Pipeline failed"
+            echo "❌ FAILED"
         }
     }
 }
