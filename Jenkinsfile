@@ -16,18 +16,25 @@ pipeline {
                 checkout scm
             }
         }
-
-        stage('Tests (PHPUnit)') {
+        stage('Debug Docker') {
+            steps {
+                sh 'docker version'
+                sh 'php -v || true'
+            }
+        }
+        tage('Tests (PHPUnit)') {
             steps {
                 sh '''
                 docker run --rm \
                 -v $WORKSPACE:/var/www \
                 -w /var/www \
-                php:8.2-cli \
+                php-ci \
                 bash -c "composer install && php artisan test"
                 '''
             }
         }
+
+        
 
         stage('SonarCloud Analysis') {
             steps {
