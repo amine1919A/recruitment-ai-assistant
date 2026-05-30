@@ -14,6 +14,11 @@ pipeline {
                 sh 'docker version'
             }
         }
+        stage('Build Test Image') {
+            steps {
+                sh 'docker build -f Dockerfile.test -t laravel-test:latest . '
+            }
+        }
         stage('Tests (PHPUnit)') {
             steps {
                 sh '''
@@ -24,13 +29,8 @@ pipeline {
                         -e APP_KEY=base64:2fl+Jb4JHbHvaTFgE3BNpjLDfkKIHpBHjqFmJPXhMew= \
                         -e DB_CONNECTION=sqlite \
                         -e DB_DATABASE=/tmp/test.db \
-                        -e DEBIAN_FRONTEND=noninteractive \
-                        php:8.2-cli \
+                        laravel-test:latest \
                         bash -c "
-                            apt-get update -qq &&
-                            apt-get install -y -qq --no-install-recommends unzip curl git libzip-dev libonig-dev libxml2-dev libsqlite3-dev &&
-                            docker-php-ext-install pdo pdo_mysql pdo_sqlite mbstring zip &&
-                            curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer &&
                             composer install --no-interaction --prefer-dist --quiet &&
                             php artisan test --env=testing
                         "
