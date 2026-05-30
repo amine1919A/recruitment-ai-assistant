@@ -23,17 +23,14 @@ pipeline {
             steps {
                 sh '''
                     docker run --rm \
-                        -v "$WORKSPACE":/var/www \
+                        -v /var/lib/docker/volumes/jenkins_home/_data/workspace/recruitment-ai-assistant-final:/var/www \
                         -w /var/www \
                         -e APP_ENV=testing \
-                        -e APP_KEY=base64:2fl+Jb4JHbHvaTFgE3BNpjLDfkKIHpBHjqFmJPXhMew= \
+                        -e APP_KEY="base64:2fl+Jb4JHbHvaTFgE3BNpjLDfkKIHpBHjqFmJPXhMew=" \
                         -e DB_CONNECTION=sqlite \
                         -e DB_DATABASE=/tmp/test.db \
                         laravel-test:latest \
-                        bash -c "
-                            composer install --no-interaction --prefer-dist --quiet &&
-                            php artisan test --env=testing
-                        "
+                        bash -c "composer install --no-interaction --prefer-dist --quiet && php artisan test --env=testing 2>&1"
                 '''
             }
         }
