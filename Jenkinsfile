@@ -16,22 +16,22 @@ pipeline {
         }
         stage('Build Test Image') {
             steps {
-                sh 'docker build -f Dockerfile.test -t laravel-test:latest . '
+                sh 'docker build -f Dockerfile.test -t laravel-test:latest .'
             }
         }
         stage('Tests (PHPUnit)') {
             steps {
-                sh '''
-                    docker run --rm \
-                        -v /var/lib/docker/volumes/jenkins_home/_data/workspace/recruitment-ai-assistant-final:/var/www \
-                        -w /var/www \
-                        -e APP_ENV=testing \
-                        -e APP_KEY="base64:2fl+Jb4JHbHvaTFgE3BNpjLDfkKIHpBHjqFmJPXhMew=" \
-                        -e DB_CONNECTION=sqlite \
-                        -e DB_DATABASE=/tmp/test.db \
-                        laravel-test:latest \
-                        bash -c "composer install --no-interaction --prefer-dist --quiet && mkdir -p public/build/assets && touch public/build/assets/app.js public/build/assets/app.css && printf '%s' '{\"resources/js/app.js\":{\"file\":\"assets/app.js\",\"src\":\"resources/js/app.js\",\"isEntry\":true,\"css\":[\"assets/app.css\"]},\"resources/css/app.css\":{\"file\":\"assets/app.css\",\"src\":\"resources/css/app.css\",\"isEntry\":true}}' > public/build/manifest.json && php artisan test --env=testing 2>&1"
-                '''
+                sh """
+                    docker run --rm \\
+                        -v /var/lib/docker/volumes/jenkins_home/_data/workspace/recruitment-ai-assistant-final:/var/www \\
+                        -w /var/www \\
+                        -e APP_ENV=testing \\
+                        -e APP_KEY=base64:2fl+Jb4JHbHvaTFgE3BNpjLDfkKIHpBHjqFmJPXhMew= \\
+                        -e DB_CONNECTION=sqlite \\
+                        -e DB_DATABASE=/tmp/test.db \\
+                        laravel-test:latest \\
+                        bash -c 'composer install --no-interaction --prefer-dist --quiet && mkdir -p public/build/assets && touch public/build/assets/app.js public/build/assets/app.css && printf "%s" "{\\\"resources/js/app.js\\\":{\\\"file\\\":\\\"assets/app.js\\\",\\\"src\\\":\\\"resources/js/app.js\\\",\\\"isEntry\\\":true,\\\"css\\\":[\\\"assets/app.css\\\"]},\\\"resources/css/app.css\\\":{\\\"file\\\":\\\"assets/app.css\\\",\\\"src\\\":\\\"resources/css/app.css\\\",\\\"isEntry\\\":true}}" > public/build/manifest.json && php artisan test --env=testing 2>&1'
+                """
             }
         }
         stage('SonarCloud Analysis') {
@@ -76,14 +76,12 @@ pipeline {
             }
         }
     }
-    }
-
     post {
         success {
-            echo "✅ SUCCESS"
+            echo "SUCCESS - App sur http://localhost:30080"
         }
         failure {
-            echo "❌ FAILED"
+            echo "FAILED"
         }
     }
 }
