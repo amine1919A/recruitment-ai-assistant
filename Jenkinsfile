@@ -44,9 +44,11 @@ pipeline {
                         -Dsonar.projectKey=amine1919A_recruitment-ai-assistant \
                         -Dsonar.organization=amine1919a \
                         -Dsonar.sources=. \
-                        -Dsonar.exclusions=vendor/**,node_modules/**,public/build/**,resources/js/**,resources/css/** \
+                        -Dsonar.exclusions=vendor/**,node_modules/**,public/**,resources/js/**,resources/css/**,*.js,*.ts \
                         -Dsonar.host.url=https://sonarcloud.io \
-                        -Dsonar.token=fd373d6a39ad57c37e3691802c195bb79abb9e34
+                        -Dsonar.token=fd373d6a39ad57c37e3691802c195bb79abb9e34 \
+                        -Dsonar.javascript.node.maxspace=512 \
+                        -Dsonar.language=php
                     '''
                 }
             }
