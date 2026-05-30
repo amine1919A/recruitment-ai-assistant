@@ -17,13 +17,11 @@ pipeline {
         stage('Tests (PHPUnit)') {
             steps {
                 sh '''
-                    cp .env.example .env
-
                     docker run --rm \
                         -v "$WORKSPACE":/var/www \
                         -w /var/www \
                         -e APP_ENV=testing \
-                        -e APP_KEY= \
+                        -e APP_KEY=base64:2fl+Jb4JHbHvaTFgE3BNpjLDfkKIHpBHjqFmJPXhMew= \
                         -e DB_CONNECTION=sqlite \
                         -e DB_DATABASE=/tmp/test.db \
                         php:8.2-cli \
@@ -32,7 +30,6 @@ pipeline {
                             docker-php-ext-install pdo pdo_mysql mbstring > /dev/null 2>&1 &&
                             curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer > /dev/null &&
                             composer install --no-interaction --prefer-dist --quiet &&
-                            php artisan key:generate &&
                             php artisan test --env=testing
                         "
                 '''
