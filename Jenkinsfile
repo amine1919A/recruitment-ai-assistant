@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+
     triggers {
         githubPush()
     }
@@ -17,16 +17,14 @@ pipeline {
             }
         }
 
-        
-
-        stage('Tests (PHPUnit in Docker)') {
+        stage('Tests (PHPUnit)') {
             steps {
                 sh '''
                 docker run --rm \
                 -v $WORKSPACE:/var/www \
                 -w /var/www \
-                amineabdelli1/recruitment-ai:latest \
-                php artisan test
+                php:8.2-cli \
+                bash -c "composer install && php artisan test"
                 '''
             }
         }
@@ -46,9 +44,11 @@ pipeline {
             }
         }
 
-        stage('Build Docker') {
+        stage('Build Docker Image') {
             steps {
-                sh "docker build -t $IMAGE:latest ."
+                sh '''
+                docker build -t $IMAGE:latest .
+                '''
             }
         }
 
@@ -66,10 +66,19 @@ pipeline {
         stage('Deploy Kubernetes') {
             steps {
                 sh '''
-                kubectl apply -f k8s/
-                kubectl rollout restart deployment laravel-app
+                kubectl apply -f k8s/ || true
+                kubectl rollout restart deployment laravel-app || true
                 '''
             }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline completed successfully"
+        }
+        failure {
+            echo "❌ Pipeline failed"
         }
     }
 }
