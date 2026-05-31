@@ -2,7 +2,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
         <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-800">📄 Analyse CV </h2>
+            <h2 class="text-3xl font-bold text-gray-800">📄 Analyse CV with AI</h2>
         </div>
 
         @if(session('error'))

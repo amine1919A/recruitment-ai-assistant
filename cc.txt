@@ -1,0 +1,29 @@
+Voici la liste complète des commandes à lancer à chaque démarrage :
+1 — Démarrer Docker Desktop (ouvre l'application manuellement)
+2 — Démarrer Jenkins :
+docker start jenkins
+docker exec -it --user root jenkins bash -c "chmod 666 /var/run/docker.sock"
+3 — Corriger les DNS dans Jenkins :
+docker exec -it --user root jenkins bash -c "
+    cp /etc/hosts /tmp/hosts.bak &&
+    grep -v 'github.com\|sonarcloud\|kubernetes.docker' /tmp/hosts.bak > /tmp/hosts.new &&
+    echo '140.82.121.4 github.com' >> /tmp/hosts.new &&
+    echo '99.86.171.44 sonarcloud.io' >> /tmp/hosts.new &&
+    echo '99.86.171.44 api.sonarcloud.io' >> /tmp/hosts.new &&
+    echo '192.168.65.3 kubernetes.docker.internal' >> /tmp/hosts.new &&
+    cp /tmp/hosts.new /etc/hosts
+"
+4 — Lancer ngrok :
+ngrok http 8080
+5 — Copier la nouvelle URL ngrok (ex: https://xxxx.ngrok-free.app) puis :
+6 — Mettre à jour Jenkins URL :
+Va sur http://localhost:8080/manage/configure → Jenkins URL → colle la nouvelle URL ngrok → Sauvegarde
+7 — Mettre à jour le webhook GitHub :
+Va sur https://github.com/amine1919A/recruitment-ai-assistant/settings/hooks → Edit → colle https://xxxx.ngrok-free.app/github-webhook/ → Update
+8 — Activer Kubernetes :
+kubectl apply -f k8s/mysql.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+kubectl exec deployment/laravel-app -- php artisan migrate --force
+9 — App disponible sur :
+http://localhost:30080

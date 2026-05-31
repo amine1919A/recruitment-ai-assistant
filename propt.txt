@@ -1,0 +1,467 @@
+j'a une probleme j'ab une app dej travailler en keburnets tout est bien just le probleme en jenkins lorsque je lencer build pour tester le pipeline il afficher un probleme en phpunit  de 1 deja l'app est laravel just un stage pour test voila le code de jenkinsfile pipeline {
+
+    agent any
+
+    environment {
+
+IMAGE = "amineabdelli1/recruitment-ai"
+
+    }
+
+    stages {
+
+        stage('Checkout') {
+
+            steps {
+
+                checkout scm
+
+            }
+
+        }
+
+        stage('Docker Check') {
+
+            steps {
+
+                sh 'docker version'
+
+            }
+
+        }
+
+        stage('Tests (PHPUnit)') {
+
+            steps {
+
+                sh '''
+
+                docker run --rm \
+
+                -v $WORKSPACE:/app \
+
+                -w /app \
+
+                composer:latest \
+
+                sh -c "
+
+                composer install &&
+
+                php artisan test
+
+                "
+
+                '''
+
+            }
+
+        }
+
+        stage('SonarCloud Analysis') {
+
+            steps {
+
+                withSonarQubeEnv('SonarCloud') {
+
+                    sh '''
+
+                    sonar-scanner \
+
+                    -Dsonar.projectKey=recruitment-ai-assistant \
+
+                    -Dsonar.organization=amine1919a \
+
+                    -Dsonar.sources=. \
+
+                    -Dsonar.host.url=https://sonarcloud.io \
+
+                    -Dsonar.token=${SONAR_TOKEN}
+
+                    '''
+
+                }
+
+            }
+
+        }
+
+        stage('Build Docker Image') {
+
+            steps {
+
+                sh 'docker build -t $IMAGE:latest .'
+
+            }
+
+        }
+
+        stage('Push DockerHub') {
+
+            steps {
+
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+
+                    sh '''
+
+                    echo $PASS | docker login -u $USER --password-stdin
+
+                    docker push $IMAGE:latest
+
+                    '''
+
+                }
+
+            }
+
+        }
+
+    }
+
+    post {
+
+        success {
+
+            echo "✅ SUCCESS"
+
+        }
+
+        failure {
+
+            echo "❌ FAILED"
+
+        }
+
+    }
+
+}                                     et aussi voila les code de Dockerfile FROM php:8.2-fpm
+
+# system deps
+
+RUN apt-get update && apt-get install -y \
+
+    git curl zip unzip nodejs npm \
+
+    libpng-dev libonig-dev libxml2-dev
+
+# PHP extensions
+
+RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+
+# Composer
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www
+
+# copy project
+
+COPY . .
+
+# install backend
+
+RUN composer install --no-interaction --prefer-dist
+
+# install frontend + build Vite
+
+RUN npm install
+
+RUN npm run build
+
+# Laravel optimizations
+
+RUN php artisan key:generate || true
+
+RUN php artisan storage:link || true
+
+RUN php artisan config:cache
+
+RUN php artisan route:cache
+
+RUN php artisan view:cache
+
+RUN chmod -R 777 storage bootstrap/cache
+
+EXPOSE 8000
+
+CMD php artisan serve --host=0.0.0.0 --port=8000                                  voila le code de docker-compose.yaml   services:
+
+  app:
+
+build: .
+
+ports:
+
+  - "8000:8000"
+
+volumes:
+
+  - .:/var/www
+
+command: php artisan serve --host=0.0.0.0 --port=8000
+
+vite:
+
+image: node:20
+
+working_dir: /var/www
+
+volumes:
+
+  - .:/var/www
+
+command: npm run dev
+
+ports:
+
+  - "5173:5173"
+
+mysql:
+
+image: mysql:8
+
+container_name: mysql-db
+
+restart: always
+
+environment:
+
+MYSQL_ROOT_PASSWORD: root123
+
+MYSQL_DATABASE: recAi
+
+MYSQL_USER: laravel
+
+MYSQL_PASSWORD: laravel123
+
+ports:
+
+  - "3307:3306"      aussi    les fichier de kubernets  k8s/deployement.yaml             apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+name: laravel-app
+
+spec:
+
+replicas: 1
+
+selector:
+
+matchLabels:
+
+app: laravel-app
+
+template:
+
+metadata:
+
+labels:
+
+app: laravel-app
+
+spec:
+
+containers:
+
+  - name: laravel
+
+image: amineabdelli1/recruitment-ai:latest
+
+ports:
+
+      - containerPort: 8000
+
+env:
+
+      - name: APP_ENV
+
+value: production
+
+      - name: APP_URL
+
+value: http://localhost:30080
+
+      - name: DB_HOST
+
+value: mysql-service
+
+      - name: DB_DATABASE
+
+value: recAi
+
+      - name: DB_USERNAME
+
+value: laravel
+
+      - name: DB_PASSWORD
+
+value: laravel123                                           k8s/mysql.yaml                         apiVersion: v1
+
+kind: Service
+
+metadata:
+
+name: mysql-service
+
+spec:
+
+selector:
+
+app: mysql
+
+ports:
+
+  - port: 3306
+
+---
+
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+name: mysql
+
+spec:
+
+replicas: 1
+
+selector:
+
+matchLabels:
+
+app: mysql
+
+template:
+
+metadata:
+
+labels:
+
+app: mysql
+
+spec:
+
+containers:
+
+  - name: mysql
+
+image: mysql:8
+
+env:
+
+      - name: MYSQL_DATABASE
+
+value: recAi
+
+      - name: MYSQL_USER
+
+value: laravel
+
+      - name: MYSQL_PASSWORD
+
+value: laravel123
+
+      - name: MYSQL_ROOT_PASSWORD
+
+value: root
+
+ports:
+
+      - containerPort: 3306                                               k8s/service.yaml                           apiVersion: v1
+
+kind: Service
+
+metadata:
+
+name: laravel-service
+
+spec:
+
+type: NodePort
+
+selector:
+
+app: laravel-app
+
+ports:
+
+  - port: 8000
+
+targetPort: 8000
+
+nodePort: 30080                                                      le probleme en jenkins je cree job je config le job pipline from scm  et je choisir triger pour etre automatique lorsque push  je choisir  git et je maitre le repo git avec sucee et main le probleme lorsque je lencer manuel pour test   http://localhost:8080/job/recruitment-ai-assistant-final/              chekout scm ,checkout et dockercheck et bien marcher lorsque lence phpunit il afficher probleme et pipline stoper  aussi le code de jenkisfile et bien pusher en mon repo github et le pipline deja bien lire mais le probleme lorsque lence ce stage  il affiche + docker run --rm -v /var/jenkins_home/workspace/recruitment-ai-assistant-final:/app -w /app composer:latest sh -c 
+
+                composer install &&
+
+                php artisan test
+
+                
+
+Unable to find image 'composer:latest' locally
+
+latest: Pulling from library/composer
+
+Digest: sha256:1b73755de4f19775ba6087fd5313664493e06fab72b6fc27dc2044e87bb7c4c3
+
+Status: Downloaded newer image for composer:latest
+
+Composer could not find a composer.json file in /app
+
+To initialize a project, please create a composer.json file. See https://getcomposer.org/basic-usage
+
+script returned exit code 1
+
+je donne tout les information posible                    voila le repo github https://github.com/amine1919A/recruitment-ai-assistant                  et voila deja ngrok lencer    ngrok                                                           (Ctrl+C to quit)
+
+                                                                                
+
+🚪 One gateway for every AI model. Available in early access *now*: https://ngro
+
+                                                                                
+
+Session Status                online                                            
+
+Account                       amine.abdelli1919@gmail.com (Plan: Free)          
+
+Version                       3.39.5                                            
+
+Region                        Europe (eu)                                       
+
+Latency                       144ms                                             
+
+Web Interface                 http://127.0.0.1:4041                             
+
+Forwarding                    https://fcf7-102-156-128-133.ngrok-free.app -> htt
+
+                                                                                
+
+Connections                   ttl     opn     rt1     rt5     p50     p90       
+
+                              45      0       0.00    0.00    17.75   33.58     
+
+                                                                                
+
+HTTP Requests                                                                   
+
+-------------                                                                   
+
+                                                                                
+
+11:28:12.222 CET POST    /github-webhook/                                       
+
+05:09:11.975 CET POST    /github-webhook/                                       
+
+04:10:26.007 CET OPTIONS /administrativeMonitor/hudson.diagnosis.ReverseProxySet
+
+03:52:45.422 CET POST    /github-webhook/                                       
+
+03:45:58.767 CET POST    /github-webhook/                                       
+
+03:29:20.765 CET POST    /github-webhook/                                       
+
+                                                                                                         et voila le webhook cree deja et relier avec le url bien 
