@@ -1,98 +1,176 @@
 <x-app-layout>
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="min-h-screen bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-800">📄 Analyse CV with AI</h2>
-        </div>
-
-        @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
-                {{ session('error') }}
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-gray-800">
+                    📄 Analyse CV avec IA
+                </h1>
+                <p class="text-gray-500 mt-2">
+                    Téléchargez votre CV et recevez une analyse détaillée générée par l'intelligence artificielle.
+                </p>
             </div>
-        @endif
 
-        @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <!-- UPLOAD FORM -->
-        <div class="bg-white rounded-lg shadow-md p-8 mb-8">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">📤 Uploader un nouveau CV</h3>
-            
-            <form method="POST" action="{{ route('cv.upload') }}" enctype="multipart/form-data">
-                @csrf
-
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-semibold mb-2">
-                        Sélectionnez votre CV (PDF uniquement)
-                    </label>
-                    <input type="file"
-                           name="cv"
-                           accept=".pdf"
-                           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                           required>
-                    @error('cv')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+            <!-- Alerts -->
+            @if(session('error'))
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-xl shadow-sm mb-6">
+                    {{ session('error') }}
                 </div>
+            @endif
 
-                <button type="submit"
-                        class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition font-bold">
-                    🤖 Analyser avec l'IA
-                </button>
-            </form>
-        </div>
+            @if(session('success'))
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-xl shadow-sm mb-6">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-        <!-- LISTE DES CV ANALYSÉS -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">📋 Mes CV Analysés</h3>
-            
-            @forelse($cvs as $cv)
-                <div class="border-b border-gray-200 py-4 last:border-0">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <div class="flex items-center mb-2">
-                                <span class="text-2xl mr-3">📄</span>
-                                <div>
-                                    <h4 class="font-semibold text-gray-800">{{ basename($cv->file_path) }}</h4>
-                                    <p class="text-xs text-gray-500">Analysé {{ $cv->created_at->diffForHumans() }}</p>
-                                </div>
-                            </div>
-                            
-                            <!-- APERÇU DE L'ANALYSE -->
-                            <div class="bg-gray-50 rounded-lg p-3 mt-2">
-                                <p class="text-sm text-gray-700 line-clamp-3">
-                                    {{ Str::limit(strip_tags($cv->analysis), 200) }}
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex gap-2 ml-4">
-                            <a href="{{ route('cv.show', $cv->id) }}" 
-                               class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-sm font-semibold">
-                                👁️ Voir
-                            </a>
-                            <form method="POST" action="{{ route('cv.destroy', $cv->id) }}" 
-                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette analyse ?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" 
-                                        class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-sm font-semibold">
-                                    🗑️
-                                </button>
-                            </form>
-                        </div>
+            <!-- Upload Section -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 mb-10">
+
+                <div class="flex items-center mb-6">
+                    <div class="text-5xl mr-4">🤖</div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            Télécharger un nouveau CV
+                        </h2>
+                        <p class="text-gray-500">
+                            Formats acceptés : PDF uniquement
+                        </p>
                     </div>
                 </div>
-            @empty
-                <p class="text-gray-500 text-center py-8">
-                    Aucun CV analysé pour le moment. 
-                    <span class="font-semibold">Uploadez votre premier CV ci-dessus !</span>
-                </p>
-            @endforelse
-        </div>
 
+                <form method="POST"
+                      action="{{ route('cv.upload') }}"
+                      enctype="multipart/form-data">
+
+                    @csrf
+
+                    <div class="border-2 border-dashed border-blue-300 rounded-2xl p-8 text-center bg-blue-50">
+
+                        <div class="text-6xl mb-4">📤</div>
+
+                        <label class="block text-lg font-semibold text-gray-700 mb-4">
+                            Sélectionnez votre CV
+                        </label>
+
+                        <input
+                            type="file"
+                            name="cv"
+                            accept=".pdf"
+                            required
+                            class="block w-full text-gray-700 border border-gray-300 rounded-xl px-4 py-3 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+
+                        @error('cv')
+                            <p class="text-red-500 mt-3">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                    </div>
+
+                    <div class="mt-6">
+                        <button type="submit"
+                                class="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:shadow-2xl hover:-translate-y-1 transition duration-300">
+                            🚀 Analyser avec l'IA
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!-- CV List -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        📋 Mes CV Analysés
+                    </h2>
+
+                    <span class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-semibold">
+                        {{ $cvs->count() }} CV
+                    </span>
+                </div>
+
+                @forelse($cvs as $cv)
+
+                    <div class="border border-gray-200 rounded-2xl p-5 mb-5 hover:shadow-lg transition">
+
+                        <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start">
+
+                            <div class="flex-1">
+
+                                <div class="flex items-center mb-4">
+                                    <div class="text-4xl mr-4">📄</div>
+
+                                    <div>
+                                        <h3 class="font-bold text-gray-800 text-lg">
+                                            {{ basename($cv->file_path) }}
+                                        </h3>
+
+                                        <p class="text-sm text-gray-500">
+                                            Analysé {{ $cv->created_at->diffForHumans() }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-gray-50 rounded-xl p-4">
+                                    <p class="text-gray-700 leading-relaxed">
+                                        {{ Str::limit(strip_tags($cv->analysis), 250) }}
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div class="flex gap-3 mt-5 lg:mt-0 lg:ml-6">
+
+                                <a href="{{ route('cv.show', $cv->id) }}"
+                                   class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-semibold transition">
+                                    👁️ Voir
+                                </a>
+
+                                <form method="POST"
+                                      action="{{ route('cv.destroy', $cv->id) }}"
+                                      onsubmit="return confirm('Supprimer cette analyse ?')">
+
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="submit"
+                                            class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl font-semibold transition">
+                                        🗑️
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                @empty
+
+                    <div class="text-center py-12">
+
+                        <div class="text-7xl mb-4">📄</div>
+
+                        <h3 class="text-xl font-bold text-gray-700 mb-2">
+                            Aucun CV analysé
+                        </h3>
+
+                        <p class="text-gray-500">
+                            Téléchargez votre premier CV pour commencer.
+                        </p>
+
+                    </div>
+
+                @endforelse
+
+            </div>
+
+        </div>
     </div>
 </x-app-layout>
