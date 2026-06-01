@@ -72,11 +72,16 @@ pipeline {
             steps {
                 sh '''
                     export KUBECONFIG=/var/jenkins_home/.kube/config
+
                     kubectl apply -f k8s/mysql.yaml
-                    kubectl apply -f k8s/deployment.yaml
                     kubectl apply -f k8s/service.yaml
-                    kubectl rollout restart deployment/laravel-app
-                    kubectl rollout status deployment/laravel-app --timeout=120s
+
+                    # 🔥 IMPORTANT: update image instead of restart
+                    kubectl set image deployment/laravel-app \
+                        laravel-app=$IMAGE:latest
+
+                    # wait rollout safely
+                    kubectl rollout status deployment/laravel-app --timeout=300s
                 '''
             }
         }
