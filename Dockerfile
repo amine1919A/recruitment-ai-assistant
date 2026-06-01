@@ -1,30 +1,29 @@
-FROM composer:2 AS vendor
-
-WORKDIR /app
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader
-
-
-FROM node:20 AS frontend
-
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-
 FROM php:8.2-fpm
 
-WORKDIR /var/www
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y git unzip curl libpng-dev libonig-dev libxml2-dev
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git curl zip unzip \
+    libpng-dev libonig-dev libxml2-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
 
-COPY --from=vendor /app/vendor ./vendor
-COPY --from=frontend /app/public/build ./public/build
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /var/www
+
 COPY . .
+
+RUN composer install --no-interaction --prefer-dist
+
+RUN npm install && npm run build
+
+RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 8000
 CMD php artisan serve --host=0.0.0.0 --port=8000

@@ -55,11 +55,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh '''
-                    docker build \
-                        --cache-from=$IMAGE:latest \
-                        -t $IMAGE:latest .
-                '''
+                sh 'docker build -t $IMAGE:latest .'
             }
         }
         stage('Push DockerHub') {
