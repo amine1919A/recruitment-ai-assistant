@@ -27,3 +27,6 @@ kubectl apply -f k8s/service.yaml
 kubectl exec deployment/laravel-app -- php artisan migrate --force
 9 — App disponible sur :
 http://localhost:30080
+
+
+lorsque serveur 500   kubectl exec deployment/laravel-app -- php artisan migrate --force
