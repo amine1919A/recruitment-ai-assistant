@@ -15,8 +15,11 @@ spec:
       containers:
         - name: laravel
           image: amineabdelli1/recruitment-ai:latest
+          imagePullPolicy: Always   # 🔥 IMPORTANT FIX
+
           ports:
             - containerPort: 8000
+
           env:
             - name: APP_ENV
               value: production

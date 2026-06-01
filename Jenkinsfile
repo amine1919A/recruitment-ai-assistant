@@ -55,7 +55,11 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE:latest .'
+                sh '''
+                    docker build \
+                        --cache-from=$IMAGE:latest \
+                        -t $IMAGE:latest .
+                '''
             }
         }
         stage('Push DockerHub') {
@@ -72,29 +76,17 @@ pipeline {
             steps {
                 sh '''
                     set -e
-
                     export KUBECONFIG=/var/jenkins_home/.kube/config
 
-                    echo "📦 Applying Kubernetes manifests..."
-                    kubectl apply -f k8s/mysql.yaml
-                    kubectl apply -f k8s/service.yaml
-                    kubectl apply -f k8s/deployment.yaml
-
-                    echo "🔄 Updating application image..."
-
-                    # IMPORTANT: container name MUST match k8s/deployment.yaml
-                    CONTAINER_NAME=$(kubectl get deployment laravel-app \
-                        -o jsonpath="{.spec.template.spec.containers[0].name}")
-
-                    echo "Container detected: $CONTAINER_NAME"
+                    echo "🚀 Deploying new version..."
 
                     kubectl set image deployment/laravel-app laravel=$IMAGE:latest
 
-                    echo "⏳ Waiting for rollout..."
+                    kubectl rollout restart deployment/laravel-app
 
                     kubectl rollout status deployment/laravel-app --timeout=300s
 
-                    echo "✅ Deployment successful"
+                    echo "✅ Deployment finished"
                 '''
             }
         }
