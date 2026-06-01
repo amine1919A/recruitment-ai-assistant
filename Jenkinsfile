@@ -88,8 +88,7 @@ pipeline {
 
                     echo "Container detected: $CONTAINER_NAME"
 
-                    kubectl set image deployment/laravel-app \
-                        $CONTAINER_NAME=$IMAGE:latest
+                    kubectl set image deployment/laravel-app laravel=$IMAGE:latest
 
                     echo "⏳ Waiting for rollout..."
 
