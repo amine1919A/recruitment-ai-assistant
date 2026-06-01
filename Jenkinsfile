@@ -71,17 +71,31 @@ pipeline {
         stage('Deploy Kubernetes') {
             steps {
                 sh '''
+                    set -e
+
                     export KUBECONFIG=/var/jenkins_home/.kube/config
 
+                    echo "📦 Applying Kubernetes manifests..."
                     kubectl apply -f k8s/mysql.yaml
                     kubectl apply -f k8s/service.yaml
+                    kubectl apply -f k8s/deployment.yaml
 
-                    # 🔥 IMPORTANT: update image instead of restart
+                    echo "🔄 Updating application image..."
+
+                    # IMPORTANT: container name MUST match k8s/deployment.yaml
+                    CONTAINER_NAME=$(kubectl get deployment laravel-app \
+                        -o jsonpath="{.spec.template.spec.containers[0].name}")
+
+                    echo "Container detected: $CONTAINER_NAME"
+
                     kubectl set image deployment/laravel-app \
-                        laravel-app=$IMAGE:latest
+                        $CONTAINER_NAME=$IMAGE:latest
 
-                    # wait rollout safely
+                    echo "⏳ Waiting for rollout..."
+
                     kubectl rollout status deployment/laravel-app --timeout=300s
+
+                    echo "✅ Deployment successful"
                 '''
             }
         }
