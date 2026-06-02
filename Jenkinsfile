@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         IMAGE = "amineabdelli1/recruitment-ai"
+        TAG   = "${BUILD_NUMBER}"
     }
     stages {
         stage('Checkout') {
@@ -55,7 +56,10 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE:latest .'
+                sh '''
+                    docker build --no-cache -t $IMAGE:$TAG .
+                    docker tag $IMAGE:$TAG $IMAGE:latest
+                '''
             }
         }
         stage('Push DockerHub') {
@@ -70,6 +74,7 @@ pipeline {
                         echo "52.205.187.141 index.docker.io" >> /etc/hosts
 
                         echo $PASS | docker login -u $USER --password-stdin
+                        docker push $IMAGE:$TAG
                         docker push $IMAGE:latest
                     '''
                 }
@@ -80,16 +85,11 @@ pipeline {
                 sh '''
                     set -e
                     export KUBECONFIG=/var/jenkins_home/.kube/config
-
-                    echo "🚀 Deploying new version..."
-
-                    kubectl set image deployment/laravel-app laravel=$IMAGE:latest
-
+                    echo "Deploying build #$TAG..."
+                    kubectl set image deployment/laravel-app laravel=$IMAGE:$TAG
                     kubectl rollout restart deployment/laravel-app
-
                     kubectl rollout status deployment/laravel-app --timeout=300s
-
-                    echo "✅ Deployment finished"
+                    echo "Deployment finished"
                 '''
             }
         }
