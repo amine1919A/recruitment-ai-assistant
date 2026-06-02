@@ -83,6 +83,11 @@ pipeline {
                 sh '''
                     set -e
                     export KUBECONFIG=/var/jenkins_home/.kube/config
+
+                    # Fix DNS pour kubernetes.docker.internal
+                    grep -q "kubernetes.docker.internal" /etc/hosts || \
+                        echo "172.17.0.1 kubernetes.docker.internal" >> /etc/hosts
+
                     echo "Deploying build #$TAG..."
                     kubectl set image deployment/laravel-app laravel=$IMAGE:$TAG
                     kubectl rollout restart deployment/laravel-app
