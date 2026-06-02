@@ -69,11 +69,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     sh '''
                         # Force IPv4 pour Docker Hub
-                        echo "172.64.144.78 auth.docker.io" >> /etc/hosts
-                        echo "104.18.43.178 auth.docker.io" >> /etc/hosts
-                        echo "52.205.187.141 registry-1.docker.io" >> /etc/hosts
-                        echo "107.23.56.59 registry-1.docker.io" >> /etc/hosts
-                        echo "52.205.187.141 index.docker.io" >> /etc/hosts
+                        printf "172.64.144.78 auth.docker.io\n104.18.43.178 auth.docker.io\n52.205.187.141 registry-1.docker.io\n107.23.56.59 registry-1.docker.io\n52.205.187.141 index.docker.io\n" | tee -a /etc/hosts || true
 
                         echo $PASS | docker login -u $USER --password-stdin
                         docker push $IMAGE:$TAG
