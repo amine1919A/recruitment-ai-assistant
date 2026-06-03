@@ -23,7 +23,12 @@ RUN composer install --no-interaction --prefer-dist
 
 RUN npm install && npm run build
 
-RUN chmod -R 777 storage bootstrap/cache
+RUN mkdir -p storage/framework/views \
+             storage/framework/cache \
+             storage/framework/sessions \
+             storage/logs \
+             bootstrap/cache && \
+    chmod -R 777 storage bootstrap/cache
 
 EXPOSE 8000
 CMD php artisan serve --host=0.0.0.0 --port=8000
