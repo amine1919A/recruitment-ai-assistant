@@ -12,14 +12,25 @@ spec:
       labels:
         app: laravel-app
     spec:
+      initContainers:
+        - name: fix-storage
+          image: amineabdelli1/recruitment-ai:latest
+          command: ["bash", "-c"]
+          args:
+            - |
+              mkdir -p /var/www/storage/framework/views \
+                        /var/www/storage/framework/cache \
+                        /var/www/storage/framework/sessions \
+                        /var/www/storage/logs \
+                        /var/www/bootstrap/cache &&
+              chmod -R 777 /var/www/storage /var/www/bootstrap/cache &&
+              echo "Storage fixed!"
       containers:
         - name: laravel
           image: amineabdelli1/recruitment-ai:latest
-          imagePullPolicy: Always   # 🔥 IMPORTANT FIX
-
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
-
           env:
             - name: APP_ENV
               value: production
@@ -27,13 +38,32 @@ spec:
               value: "base64:2fl+Jb4JHbHvaTFgE3BNpjLDfkKIHpBHjqFmJPXhMew="
             - name: APP_URL
               value: http://localhost:30080
+            - name: APP_DEBUG
+              value: "false"
             - name: DB_CONNECTION
               value: mysql
             - name: DB_HOST
               value: mysql-service
+            - name: DB_PORT
+              value: "3306"
             - name: DB_DATABASE
               value: recAi
             - name: DB_USERNAME
               value: laravel
             - name: DB_PASSWORD
               value: laravel123
+            - name: OPENCODE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: opencode-secret
+                  key: OPENCODE_API_KEY
+            - name: OPENCODE_MODEL
+              value: "deepseek-v4-flash-free"
+            - name: CACHE_STORE
+              value: file
+            - name: SESSION_DRIVER
+              value: file
+            - name: LOG_CHANNEL
+              value: stack
+            - name: LOG_LEVEL
+              value: error
