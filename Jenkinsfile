@@ -74,9 +74,6 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     sh '''
-                        # Force IPv4 pour Docker Hub
-                        printf "172.64.144.78 auth.docker.io\n104.18.43.178 auth.docker.io\n52.205.187.141 registry-1.docker.io\n107.23.56.59 registry-1.docker.io\n52.205.187.141 index.docker.io\n" | tee -a /etc/hosts || true
-
                         echo $PASS | docker login -u $USER --password-stdin
                         docker push $IMAGE:$TAG
                         docker push $IMAGE:latest
@@ -86,20 +83,16 @@ pipeline {
         }
         stage('Deploy Kubernetes') {
             steps {
-                sh '''
-                    set -e
-                    export KUBECONFIG=/var/jenkins_home/.kube/config
+                    sh '''
+                        set -e
+                        export KUBECONFIG=/var/jenkins_home/.kube/config
 
-                    # Fix DNS pour kubernetes.docker.internal
-                    grep -q "kubernetes.docker.internal" /etc/hosts || \
-                        echo "172.17.0.1 kubernetes.docker.internal" >> /etc/hosts
-
-                    echo "Deploying build #$TAG..."
-                    kubectl set image deployment/laravel-app laravel=$IMAGE:$TAG
-                    kubectl rollout restart deployment/laravel-app
-                    kubectl rollout status deployment/laravel-app --timeout=300s
-                    echo "Deployment finished"
-                '''
+                        echo "Deploying build #$TAG..."
+                        kubectl set image deployment/laravel-app laravel=$IMAGE:$TAG
+                        kubectl rollout restart deployment/laravel-app
+                        kubectl rollout status deployment/laravel-app --timeout=300s
+                        echo "Deployment finished"
+                    '''
             }
         }
     }
