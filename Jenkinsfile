@@ -48,8 +48,6 @@ pipeline {
                         "SONAR_SCANNER_OPTS=-Djava.net.preferIPv4Stack=true"
                     ]) {
                         sh '''
-                            grep -q "sonarcloud.io" /etc/hosts || echo "99.86.171.12 sonarcloud.io" >> /etc/hosts
-
                             sonar-scanner \
                             -Dsonar.projectKey=amine1919A_recruitment-ai-assistant \
                             -Dsonar.organization=amine1919a \
