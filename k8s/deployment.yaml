@@ -37,7 +37,7 @@ spec:
             - name: APP_KEY
               value: "base64:2fl+Jb4JHbHvaTFgE3BNpjLDfkKIHpBHjqFmJPXhMew="
             - name: APP_URL
-              value: http://localhost:30080
+              value: https://localhost:30080
             - name: APP_DEBUG
               value: "false"
             - name: DB_CONNECTION
