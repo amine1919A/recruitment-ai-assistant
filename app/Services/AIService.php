@@ -50,6 +50,9 @@ class AIService
         }
 
         $result = $response->json('choices.0.message.content');
+        if (empty($result)) {
+            $result = $response->json('choices.0.message.reasoning_content');
+        }
 
         return $result ?? "Pas de réponse valide de l'IA.";
     }
