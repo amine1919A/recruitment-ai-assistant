@@ -58,7 +58,7 @@ spec:
                   name: opencode-secret
                   key: OPENCODE_API_KEY
             - name: OPENCODE_MODEL
-              value: "deepseek-v4-flash-free"
+              value: "nemotron-3-ultra-free"
             - name: CACHE_STORE
               value: file
             - name: SESSION_DRIVER
