@@ -2,16 +2,14 @@ FROM jenkins/jenkins:lts
 
 USER root
 
-# install docker CLI
-RUN apt-get update && apt-get install -y \
-    docker.io \
-    curl \
-    git \
-    unzip \
-    bash
+RUN apt-get update -qq && \
+    apt-get install -y -qq --no-install-recommends docker-cli kubectl && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# kubectl (optionnel)
-RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
-    && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+RUN groupadd -g 973 docker && usermod -aG docker jenkins
+
+COPY jenkins-entrypoint.sh /usr/local/bin/jenkins-entrypoint.sh
+RUN chmod +x /usr/local/bin/jenkins-entrypoint.sh
 
 USER jenkins
+ENTRYPOINT ["/usr/local/bin/jenkins-entrypoint.sh"]
