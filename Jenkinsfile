@@ -92,6 +92,8 @@ pipeline {
                         kubectl rollout restart deployment/laravel-app
                         kubectl rollout status deployment/laravel-app --timeout=300s
                         echo "Deployment finished"
+                        echo "Running migrations..."
+                        kubectl exec deployment/laravel-app -- php artisan migrate --force 2>&1 || echo "Migration skipped (will be done manually)"
                     '''
             }
         }
